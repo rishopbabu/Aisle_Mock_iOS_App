@@ -7,26 +7,26 @@
 
 import SwiftUI
 
-struct OtpView: View {
-    @State private var otp: String = ""
-    @State private var timer: Int = 59
-    @State private var phoneNumber: String = "+91 9999999999"
-    @State private var timerRunning = true
-    
-    let timerInterval = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+struct OTPScreen: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var viewModel: OTPViewModel
+
+    init(phoneWithCode: String) {
+        _viewModel = StateObject(wrappedValue: OTPViewModel(phoneWithCode: phoneWithCode))
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             Spacer().frame(height: 40)
             
             HStack {
-                Text(phoneNumber)
+                Text(viewModel.phoneWithCode)
                     .font(.body)
                     .fontWeight(.medium)
                     .foregroundColor(.black)
                 
                 Button {
-                    //
+                    dismiss()
                 } label: {
                     Image(systemName: "pencil")
                         .foregroundStyle(.black)
@@ -40,20 +40,26 @@ struct OtpView: View {
                 .font(.system(size: 34, weight: .bold))
                 .foregroundStyle(.black)
             
-            TextField("0000", text: $otp)
+            TextField("0000", text: $viewModel.otp)
                 .fontWeight(.bold)
                 .keyboardType(.phonePad)
                 .padding()
-                .frame(width: 100,height: 40)
+                .frame(width: 100, height: 40)
                 .background(Color.white)
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.gray.opacity(0.4), lineWidth: 1)
                 }
             
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.footnote)
+            }
+            
             HStack(spacing: 10) {
                 Button(action: {
-                    // Continue action
+                    viewModel.verifyOTP()
                 }) {
                     Text("Continue")
                         .fontWeight(.bold)
@@ -63,7 +69,7 @@ struct OtpView: View {
                         .cornerRadius(30)
                 }
                 
-                Text("00:\(String(format: "%02d", timer))")
+                Text("00:\(String(format: "%02d", viewModel.timer))")
                     .fontWeight(.semibold)
                     .foregroundStyle(.black)
                 
@@ -71,16 +77,18 @@ struct OtpView: View {
             }
             
             Spacer()
-        }
-        .padding(.horizontal, 20)
-        .onReceive(timerInterval) { _ in
-            if timerRunning && timer > 0 {
-                timer -= 1
+            
+            NavigationLink(destination: NotesScreen(), isActive: $viewModel.navigateToHome) {
+                EmptyView()
             }
         }
+        .padding(.horizontal, 20)
+        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
+
 #Preview {
-    OtpView()
+    OTPScreen(phoneWithCode: "+91 9876543212")
 }

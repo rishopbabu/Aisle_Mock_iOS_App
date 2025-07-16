@@ -11,7 +11,7 @@ import SwiftUI
 struct Aisle_Mock_ProjectApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SignupView()
         }
     }
 }

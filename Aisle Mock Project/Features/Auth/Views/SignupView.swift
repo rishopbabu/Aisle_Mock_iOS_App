@@ -8,60 +8,67 @@
 import SwiftUI
 
 struct SignupView: View {
-    @State private var countryCode: String = "+91"
-    @State private var phoneNumber: String = ""
+    
+    @StateObject private var viewModel = SignUpViewModel()
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Spacer().frame(height: 40)
-            
-            Text("Get OTP")
-                .font(.title3)
-                .fontWeight(.regular)
-            
-            Text("Enter Your \nPhone Number")
-                .font(.system(size: 34, weight: .bold))
-                .foregroundStyle(.black)
-            
-            HStack(spacing: 12) {
-                TextField("", text: $countryCode)
-                    .fontWeight(.bold)
-                    .keyboardType(.phonePad)
-                    .padding()
-                    .frame(width: 80, height: 40)
-                    .background(Color.white)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                    }
+        NavigationView {
+            VStack(alignment: .leading, spacing: 20) {
+                Spacer().frame(height: 40)
                 
-                TextField("Phone Number", text: $phoneNumber)
-                    .fontWeight(.bold)
-                    .keyboardType(.phonePad)
-                    .padding()
-                    .frame(height: 40)
-                    .background(Color.white)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                    }
+                Text("Get OTP")
+                    .font(.title3)
+                    .fontWeight(.regular)
+                
+                Text("Enter Your \nPhone Number")
+                    .font(.system(size: 34, weight: .bold))
+                    .foregroundStyle(.black)
+                
+                HStack(spacing: 12) {
+                    TextField("", text: $viewModel.countryCode)
+                        .fontWeight(.bold)
+                        .keyboardType(.phonePad)
+                        .padding()
+                        .frame(width: 80, height: 40)
+                        .background(Color.white)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                        }
+                    
+                    TextField("Phone Number", text: $viewModel.phoneNumber)
+                        .fontWeight(.bold)
+                        .keyboardType(.phonePad)
+                        .padding()
+                        .frame(height: 40)
+                        .background(Color.white)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                        }
+                }
+                
+                Button(action: {
+                    viewModel.requestOTP()
+                }) {
+                    Text("Continue")
+                        .fontWeight(.bold)
+                        .frame(width: 140, height: 55)
+                        .background(Color.yellow)
+                        .foregroundColor(.black)
+                        .cornerRadius(30)
+                }
+                .disabled(viewModel.phoneNumber.isEmpty)
+                
+                Spacer()
+                
+                NavigationLink(destination: OTPScreen(phoneWithCode: viewModel.fullPhoneNumber), isActive: $viewModel.navigateToOTP, label: { EmptyView() })
             }
-            
-            Button(action: {
-                // Continue action
-            }) {
-                Text("Continue")
-                    .fontWeight(.bold)
-                    .frame(width: 140, height: 55)
-                    .background(Color.yellow)
-                    .foregroundColor(.black)
-                    .cornerRadius(30)
-            }
-            
-            Spacer()
+            .padding(.horizontal, 24)
+            .background(Color.white.ignoresSafeArea())
+            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
         }
-        .padding(.horizontal, 24)
-        .background(Color.white.ignoresSafeArea())
     }
 }
 
